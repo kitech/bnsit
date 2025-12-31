@@ -1,0 +1,7 @@
+{
+    "name": "bnsit",
+    "compatibility_date": "2026-12-28",
+    "assets": {
+        "directory": "./dist",
+    },
+}
