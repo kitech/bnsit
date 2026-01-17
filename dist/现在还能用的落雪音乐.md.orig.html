@@ -1,0 +1,98 @@
+现在还能用的落雪音乐
+
+桌面名称，LX music
+包名，cn.toside.music.mobilf.xiazai
+版本，1.2.0-beta.3.8.2
+
+应该是已经修改过的。
+
+需要结合lx-music的内部sdk获取列表，专辑，歌手，再通过音源获取歌曲文件，
+https://github.com/lyswhut/lx-music-desktop/tree/master/src/renderer/utils/musicSdk
+src/renderer/utils/musicSdk/mg/album.js
+https://github.com/pdone/lx-music-source/
+
+音源，这个好像能拿到mp3，有验证，拿到的mp3是捐款收听，
+curl -v 'https://api.ikunshare.com/url?key=public_source&checkUpdate=7aa01490ebe2c9d46e0711518d8217d6&source=kg&quality=128k&songId=123' -H "User-Agent: lx-music-desktop/1.8"
+
+直接上链接，
+
+https://github.com/Huibq/keep-alive
+
+https://raw.niuma666bet.buzz/Huibq/keep-alive/master/render_api.js
+
+#### 内部
+
+    lx-music-desktop/src/renderer/utils
+
+/musicSdk/
+t
+lyswhut
+lyswhut
+修复MG最新评论翻页
+a81fe6f
+ · 
+Nov 28, 2025
+..
+bd
+	
+修复因插入数字类型的ID导致其意外在末尾追加 .0 导致列表数据异常的问题
+	
+May 18, 2023
+kg
+	
+修复 kg 歌单打开失败的问题
+	
+Apr 23, 2025
+kw
+	
+修复 kw 歌单详情打开失败和 kg 热门评论获取问题
+	
+Mar 20, 2025
+mg
+	
+修复MG最新评论翻页
+	
+Nov 28, 2025
+tx
+	
+修复获取歌曲图片的函数，改为直接返回图片链接
+	
+Nov 14, 2025
+wy
+	
+优化本地歌曲换源匹配机制
+	
+Mar 8, 2024
+api-source-info.ts
+	
+移除所有内置源
+	
+Oct 18, 2023
+api-source.js
+	
+移除所有内置源
+	
+Oct 18, 2023
+index.js
+	
+优化换源歌曲查找
+	
+Dec 3, 2024
+options.js
+	
+v2.0.0
+	
+Oct 29, 2022
+utils.js
+	
+修复 tx 歌单搜索名字、描述出现乱码的问题（#2250）
+	
+Feb 4, 2025
+xm.js
+	
+音源API更新 & 其他改动 (#1295)
+	
+Apr 13, 2023
+ 
+
+Click here
