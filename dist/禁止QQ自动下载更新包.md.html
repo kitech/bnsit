@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>禁止QQ自动下载更新包.md.orig.html</title>
+</head>
+<body>
+<p>禁止QQ自动下载更新包</p>
+<h3 id="section">最直接有效的方式</h3>
+<p>macos 上，有效的方法，把这个目录的权限改为 root，则QQ无法下载更新了，目前使用几天来看不影响其他功能。（使用活动监视器-打开的文件和端口发现的）</p>
+<pre><code>sudo chown root ~&#47;Library&#47;Containers&#47;com.tencent.qq&#47;Data&#47;Library&#47;Application\ Support&#47;QQ&#47;versions&#47;
+</code></pre>
+<ul>
+<li>正在下载更新包示例， ~&#47;Library&#47;Containers&#47;com.tencent.qq&#47;Data&#47;Library&#47;Application Support&#47;QQ&#47;versions&#47;6.9.88-44725.zip.zip</li>
+</ul>
+<h3 id="section-1">修改下载更新包域名</h3>
+<pre><code>dldir.qq.com
+dldir6.qq.com
+qqpatch.gtimg.cn
+</code></pre>
+<p>据说屏幕掉这两个域名就行。(但是改了也没用)</p>
+<p>最后一个域名还没有尝试。</p>
+<h4 id="hosts">修改 hosts</h4>
+<p>$ sudo vim &#47;private&#47;etc&#47;hosts</p>
+<pre><code>127.0.0.1 dldir.qq.com
+127.0.0.1 dldir6.qq.com
+127.0.0.1 qqpatch.gtimg.cn
+</code></pre>
+<h3 id="section-2">更多分析网络流量的工具，还没用上就解决了</h3>
+<p>Charles - 一个代理工具，允许你查看所有的 HTTP 和 HTTPS 流量。
+<a href="https://www.charlesproxy.com/download/">https:&#47;&#47;www.charlesproxy.com&#47;download&#47;</a></p>
+<p>Proxyman - 适用于 macOS 的现代直观 HTTP 调试代理. Freeware
+Wireshark - 世界上最广泛使用的网络协议分析软件。 Open-Source Software Freeware</p>
+</body>
+</html>

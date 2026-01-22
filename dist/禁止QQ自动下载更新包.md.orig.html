@@ -1,0 +1,41 @@
+禁止QQ自动下载更新包
+
+### 最直接有效的方式
+
+macos 上，有效的方法，把这个目录的权限改为 root，则QQ无法下载更新了，目前使用几天来看不影响其他功能。（使用活动监视器-打开的文件和端口发现的）
+
+```
+sudo chown root ~/Library/Containers/com.tencent.qq/Data/Library/Application\ Support/QQ/versions/
+```
+
+* 正在下载更新包示例， ~/Library/Containers/com.tencent.qq/Data/Library/Application Support/QQ/versions/6.9.88-44725.zip.zip
+
+### 修改下载更新包域名
+
+```
+dldir.qq.com
+dldir6.qq.com
+qqpatch.gtimg.cn
+```
+
+据说屏幕掉这两个域名就行。(但是改了也没用)
+
+最后一个域名还没有尝试。
+
+#### 修改 hosts
+
+$ sudo vim /private/etc/hosts
+
+```
+127.0.0.1 dldir.qq.com
+127.0.0.1 dldir6.qq.com
+127.0.0.1 qqpatch.gtimg.cn
+```
+
+### 更多分析网络流量的工具，还没用上就解决了
+
+Charles - 一个代理工具，允许你查看所有的 HTTP 和 HTTPS 流量。
+https://www.charlesproxy.com/download/
+
+Proxyman - 适用于 macOS 的现代直观 HTTP 调试代理. Freeware
+Wireshark - 世界上最广泛使用的网络协议分析软件。 Open-Source Software Freeware
