@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>在mac上link新版本libcurl.md.orig.html</title>
+</head>
+<body>
+<p>在mac上link新版本libcurl</p>
+<p>vcpkg install curl:x64-osx-dynamic</p>
+<p>使用vcpkg安装libcurl之后，
+在 VCPKG_ROOT 库目录下执行，
+ln -sv libcurl.dylib libcurlnm.dylib</p>
+<p>link时使用特定的库名称，-lcurlnm</p>
+<p>指定目录是可行的，只是还有其他系统库要链接，使用场景链接顺序不容易调整。</p>
+<p>以后还是要考虑更合适的方法。</p>
+</body>
+</html>
