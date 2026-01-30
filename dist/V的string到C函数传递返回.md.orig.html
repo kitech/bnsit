@@ -1,0 +1,93 @@
+传递V的string到C函数并返回V的string
+
+这个功能方便在C中实现V函数，在V中只需要声明一个无函数体的函数即可。
+
+在单独的C文件中，正常情况是无法得知V定义的string结构体的。但是在链接的时候V定义的string函数是可以使用的。
+
+需要一个简单的模拟V的string的结构体，同时extern几个简单的string函数，
+
+```
+// typedef struct string vstring;
+#ifndef string
+    typedef struct string {
+        char* str; 	int len; 	int is_lit;
+    } vstring;
+#endif
+
+extern vstring builtin__tos(const char* ptr, int len);
+extern vstring builtin__tos3(const char*);
+extern vstring builtin__tos_clone(const char*);
+extern vstring builtin__string_clone(vstring);
+
+```
+
+以下是C中实现V类型方法的示例代码，
+
+```
+CURLU* VNS(parse_url_ic)(vstring s, int* rc) {
+    CURLU *h = curl_url();
+    int flags = CURLU_NON_SUPPORT_SCHEME | CURLU_ALLOW_SPACE;
+    *rc = curl_url_set(h, CURLUPART_URL, s.str, flags);
+    if (*rc!=0) {
+        curl_url_cleanup(h);
+        return 0;
+    }
+    return h;
+}
+
+vstring VNS(url_strerror)(int rc) {
+    return builtin__tos3(curl_url_strerror(rc));
+}
+
+#define V_CURL_URL_GET_STR(uh, pno) \
+    char* part = 0;         \
+    int flags = CURLU_NON_SUPPORT_SCHEME | CURLU_ALLOW_SPACE;   \
+    int rc = curl_url_get(uh, pno, &part, flags);     \
+    if (0) { printf("%p, %d, %s\n", part, rc, curl_url_strerror(rc)); }   \
+    if (part==0) { vstring res = {0}; return res; }       \
+    assert(rc==0);                              \
+    vstring res = builtin__tos_clone(part);         \
+    curl_free(part);            \
+    return res;
+
+vstring VNS(Url_scheme)(CURLU* h) { V_CURL_URL_GET_STR(h, CURLUPART_SCHEME); }
+vstring VNS(Url_host)(CURLU* h) { V_CURL_URL_GET_STR(h, CURLUPART_HOST); }
+vstring VNS(Url_port)(CURLU* h) { V_CURL_URL_GET_STR(h, CURLUPART_PORT); }
+vstring VNS(Url_user)(CURLU* h) { V_CURL_URL_GET_STR(h, CURLUPART_USER); }
+vstring VNS(Url_pass)(CURLU* h) { V_CURL_URL_GET_STR(h, CURLUPART_PASSWORD); }
+vstring VNS(Url_path)(CURLU* h) { V_CURL_URL_GET_STR(h, CURLUPART_PATH); }
+vstring VNS(Url_query)(CURLU* h) { V_CURL_URL_GET_STR(h, CURLUPART_QUERY); }
+vstring VNS(Url_fragment)(CURLU* h) { V_CURL_URL_GET_STR(h, CURLUPART_FRAGMENT); }
+
+```
+
+其中， VNS 是编译器魔法宏，把后面的函数名变为当前V模块前缀。
+
+以下是V代码，
+
+```
+@[importc] fn parse_url_ic(s string, rc &int) Url
+
+@[importc] pub fn url_strerror(rc int) string
+
+@[importc] pub fn (uo Url) scheme() string
+@[importc] pub fn (uo Url) user() string
+@[importc] pub fn (uo Url) pass() string
+
+@[importc] pub fn (uo Url) host() string
+@[importc] pub fn (uo Url) port() string
+@[importc] pub fn (uo Url) path() string
+@[importc] pub fn (uo Url) fragment() string
+
+@[importc] pub fn (uo Url) query() string
+
+```
+
+这种封装能够让V封装的代码量少得多。
+
+在这个示例中，使用到了传递string为C参数，也用到了返回string结果。
+
+这种方式依赖V的string结构体的定义，如果发生变化，则可能产生不可预知的代码行为了。
+
+不过好在一般底层基础定义结构变化还是比较少的。
+
