@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>在C中返回V的!result类型.md.orig.html</title>
+</head>
+<body>
+<p>在C中返回V的!result类型</p>
+<p>V中的错误处理，使用!result，搭配 or {} 语句。</p>
+<p>V中的result特殊类型包括两个主要结构体，</p>
+<pre><code>typedef struct IError {
+    void*       data;
+    uint32_t    itfidx;    
+} IError;
+
+extern IError builtin__errorwc(vstring message, int code);
+
+typedef struct ResultSmall {
+    int     iserr;
+    IError  err;
+    &#47;&#47; void*   data[];
+    uint8_t    data[8];
+} ResultSmall;
+
+</code></pre>
+<p>第一个结构体简单，有现成的函数生成，用到的参数就是字符串和整数，也很容易生成。</p>
+<p>它表示一个 IError interface接口，data 存放的是错误类型数据。</p>
+<p>builtin<strong>error, builtin</strong>errorwc 生成的是一个 Error 类型的结构体，V内置的最简单的字符串类型的错误类型。</p>
+<p>第二个结构体是一个简化的结构做，仅支持返�� &#60;= sizeof(usize) 的 result，像 int, double, string, pointer。</p>
+<p>这个结构体的真实结构是动态变长的，最后一个字段存储的是函数返回类型的值，</p>
+<pre><code>typedef struct Result {
+    int     iserr;
+    IError  err;
+    T data;
+} Result;
+</code></pre>
+<p>在知道 T 的类型的情况下，直接 malloc 这个结构体，赋值并返回，在V中便能使用V特有的错误处理语法，例如有这个要封装的函数，</p>
+<pre><code class="language-V">@[importc]
+fn foo() !int
+</code></pre>
+<pre><code class="language-C">typedef struct Result_int {
+    int     iserr;
+    IError  err;
+    int data;
+} Result_int;
+
+Result_int foo() {
+    Result_int res;
+
+    ...  &#47;&#47; some operator code here
+
+    if haserr {
+        res.iserr = 1;
+        res.err = builtin__error(builtin__tos_clone("error occurs"))
+    }else{
+        res.data = 42;  
+    }
+    return res;
+}
+
+</code></pre>
+<p>在V中调用示例，
+<code>V
+x := foo() or { panic(err) }
+</code></p>
+<p>这么封装C函数，这样能够使用V的错误处理，但是稍微有点繁琐，根据自己是否有需要使用。</p>
+</body>
+</html>
