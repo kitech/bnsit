@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>抢救一下 qt6.7 低版本ndk编译.md.orig.html</title>
+</head>
+<body>
+<p>抢救一下 qt6.7 低版本ndk编译</p>
+<h3 id="section">场景，</h3>
+<ul>
+<li>android_arm64-v8a qt6.7.3。默认使用 ndk-r26 编译的，也比较新了</li>
+<li>ndk-r18 不支持 c++17</li>
+<li>qskinny@a91dcd5  2024.12
+经编译测试，有两处理使用 c++17特性的代码无法编译。</li>
+</ul>
+<h3 id="section-1">抢救方案</h3>
+<pre><code># hotfix 6.7.3&#47;android_arm64-v8a&#47; with ndk r18 no c++17 suport
+# include&#47;QtCore&#47;qtcore-config.h:5
+# #define QT_FEATURE_cxx17_filesystem -1
+
+# include&#47;QtCore&#47;qstringbuild.h:405
+# comment function:
+# operator%
+
+# include&#47;QtCore&#47;qtipccommon.h:405
+# comment function:
+# &#47;&#47; constexpr QNativeIpcKey() noexcept = default;
+
+
+</code></pre>
+<p>现在能够使用这个旧版的 ndk-r18 编译通过。 </p>
+<p>编译成功 qskinny-arm64 包，</p>
+<h3 id="section-2">总结</h3>
+<p>qt6.7 android，必须使用 c++17标准，默认对应ndk r26, 现在安装的r18版本不够。
+<code>
+#define QT_CONFIG(feature) (1&#47;QT_FEATURE_##feature == 1)
+</code>
+还有更多c++17的代码，看来是兼容不了，要更新 ndk 了。</p>
+<p>还好不兼容的代码不多，而且用不到，直接抢救成功。</p>
+<h3 id="qskinny-hotfix">另外，对 qskinny 的代码也有hotfix</h3>
+<p><a href="https://github.com/qtui/qskinny/commit/8bc872f9b67268f17c9ab0e5b21a581142a8c283">https:&#47;&#47;github.com&#47;qtui&#47;qskinny&#47;commit&#47;8bc872f9b67268f17c9ab0e5b21a581142a8c283</a></p>
+<h3 id="qt">手动安装qt任意版本的预编译包，</h3>
+<p><a href="https://download.qt.io/online/qtsdkrepository/all_os/android/qt6_673_arm64_v8a/">https:&#47;&#47;download.qt.io&#47;online&#47;qtsdkrepository&#47;all_os&#47;android&#47;qt6_673_arm64_v8a&#47;</a></p>
+<p>找到其中一个目录，wget -r -np -c 递归下载，然后 7z x 解压所有的 .7z 文件即可。</p>
+<p>一般安装到 &#47;opt&#47;qt&#47;6.7.3&#47;android_arm64-v8a&#47;{bin,lib}</p>
+</body>
+</html>
