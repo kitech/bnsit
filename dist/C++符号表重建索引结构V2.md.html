@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>C++符号表重建索引结构V2.md.orig.html</title>
+</head>
+<body>
+<p>C++符号表重建索引结构V2</p>
+<p>重建的符号表用于运行时根据类名，方法名和参数，确定调用哪个重载方法。</p>
+<h3 id="section">这次主要改进</h3>
+<ul>
+<li><p>hashmap 改用支持非 null 结尾带长度的字符串的hashmap 。
+key 值格式变了，直接引用symbol的子字符串，减少内存使用。</p></li>
+<li><p>改进了C++ namespace的支持，能够透明支持 带有  namespace 的符号&#47;库。</p></li>
+<li><p>能够区分是否是 virtual class 和 non vritual class，以便后面做更多优化。</p></li>
+</ul>
+<h3 id="section-1">字符串引用的结构，</h3>
+<pre><code>typedef struct CSIString {
+    char* str;
+    int   len;
+    int   flags; &#47;&#47;  是否需要 free 1&#47;0
+} CSIString;
+</code></pre>
+<h3 id="key-">key 子字符串格式</h3>
+<p>总体就是带了字符串的长度，不拆分原符号字符串，</p>
+<p>去掉C++ 符号 <em>ZN&#47;</em>ZNK 前缀，和 参数部分。</p>
+<ul>
+<li><p>普通��法  NfooNbarNClassNMethod</p></li>
+<li><p>构造函数  NfooNbarNClassC</p></li>
+<li><p>构造函数  NfooNbarNClassD</p></li>
+</ul>
+<p>N 表示紧接其后的字符串长度，Class 之前的部分是 ns，C&#47;D 表示 ctor&#47;dtor。</p>
+<p>使用这种格式原因，不需要拷贝，比较方便使用的时候拼接查询。</p>
+<h3 id="hashmap-">hashmap 的值格式</h3>
+<p>重载方法数组，同名方法所有的变体。</p>
+<pre><code>struct FuncInfo {
+    char* symori; &#47;&#47; ref
+    char* sigt;   &#47;&#47; copy
+    int8 demangled; &#47;&#47; fill sigt
+    int8 isctor;
+    int8 isdtor;
+    int8 isstatic;
+    int8 isoperator;
+    int8 isfreefn;
+    int8 prmcnt;
+    Array* prms; &#47;&#47; ParamInfo prms[];
+
+}
+
+struct ParamInfo {
+     
+}
+
+</code></pre>
+<h3 id="todo-">TODO 参数类型简化缓存</h3>
+<p>直接使用C++ mangle 类型的引用，改进类型识别与匹配机制。</p>
+<h3 id="section-2">效果总结</h3>
+<p>内存减少20M，字符串拷贝少许多。新hashmap，建立索引320ms(原来150ms)。查询几乎一样。</p>
+</body>
+</html>

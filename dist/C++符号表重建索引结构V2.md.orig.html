@@ -1,0 +1,70 @@
+C++符号表重建索引结构V2
+
+重建的符号表用于运行时根据类名，方法名和参数，确定调用哪个重载方法。
+
+### 这次主要改进
+* hashmap 改用支持非 null 结尾带长度的字符串的hashmap 。
+    key 值格式变了，直接引用symbol的子字符串，减少内存使用。
+
+* 改进了C++ namespace的支持，能够透明支持 带有  namespace 的符号/库。
+
+* 能够区分是否是 virtual class 和 non vritual class，以便后面做更多优化。
+
+### 字符串引用的结构，
+```
+typedef struct CSIString {
+    char* str;
+    int   len;
+    int   flags; //  是否需要 free 1/0
+} CSIString;
+```
+
+### key 子字符串格式
+
+总体就是带了字符串的长度，不拆分原符号字符串，
+
+去掉C++ 符号 _ZN/_ZNK 前缀，和 参数部分。
+
+*  普通��法  NfooNbarNClassNMethod
+    
+*  构造函数  NfooNbarNClassC
+
+*  构造函数  NfooNbarNClassD
+
+N 表示紧接其后的字符串长度，Class 之前的部分是 ns，C/D 表示 ctor/dtor。
+
+使用这种格式原因，不需要拷贝，比较方便使用的时候拼接查询。
+
+### hashmap 的值格式
+
+重载方法数组，同名方法所有的变体。
+
+```
+struct FuncInfo {
+    char* symori; // ref
+    char* sigt;   // copy
+    int8 demangled; // fill sigt
+    int8 isctor;
+    int8 isdtor;
+    int8 isstatic;
+    int8 isoperator;
+    int8 isfreefn;
+    int8 prmcnt;
+    Array* prms; // ParamInfo prms[];
+
+}
+
+struct ParamInfo {
+     
+}
+
+```
+
+### TODO 参数类型简化缓存
+
+直接使用C++ mangle 类型的引用，改进类型识别与匹配机制。
+
+### 效果总结
+
+内存减少20M，字符串拷贝少许多。新hashmap，建立索引320ms(原来150ms)。查询几乎一样。
+
